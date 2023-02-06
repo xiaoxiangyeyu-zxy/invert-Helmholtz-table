@@ -85,18 +85,18 @@ def get_energy(iat, jat):
     den = denele / ye
     tem = 10**(4.+0.1*jat)
     # electron - positron e de/dt
-    sele = -eos_ft[iat, jat]  # entropy s
-    dsepdt = -eos_ftt[iat, jat]  # ds/dt
+    sele = -eos_ft[iat, jat] * ye  # entropy s
+    dsepdt = -eos_ftt[iat, jat] * ye  # ds/dt
 
-    eele = eos_f[iat, jat] + tem * sele  # internal energy e
-    deepdt = tem * dsepdt  # de/dt
+    eele = ye * eos_f[iat, jat] + tem * sele  # internal energy e
+    #  deepdt = tem * dsepdt  # de/dt
 
     # ion e de/dt
     kerg = 1.380658e-16
     avo = 6.0221367e23
     kt = kerg * tem
     eion = 1.5e0 * avo * kt / abar
-    deiondt = 1.5e0 * avo * kerg / abar
+    #  deiondt = 1.5e0 * avo * kerg / abar
 
     # rad e de/dt
     c = 2.99792458e10
@@ -105,13 +105,13 @@ def get_energy(iat, jat):
     asoli3 = asol / 3.0e0
     prad = asoli3 * tem * tem * tem * tem
     erad = 3.0e0 * prad / den
-    deraddt = 4.0e0 * erad / tem
+    #  deraddt = 4.0e0 * erad / tem
 
     # total
     etot = eion + erad + eele
-    dedt = deraddt + deiondt + deepdt
+    #  dedt = deraddt + deiondt + deepdt
 
-    return etot, dedt
+    return etot
 
 
 emax = []
@@ -119,7 +119,7 @@ emin = []
 for i in range(EOSIUSE):
     E_T = []
     for j in range(EOSJMAX):
-        ereal, dedtreal = get_energy(i, j)
+        ereal = get_energy(i, j)
         E_T.append(ereal)
     for k in range(EOSJMAX-1):
         if E_T[k] > E_T[k+1]:
