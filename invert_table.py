@@ -211,13 +211,15 @@ def h5(w0t, w1t, w2t, w0mt, w1mt, w2mt, w0d, w1d, w2d, w0md, w1md, w2md):
     return res
 
 
-def interpolate_energy(den, btemp):
-    din = ye * den
+def getij(din, btemp):
     jat = int((math.log10(btemp) - eos_tlo) * eos_tstpi)
     jat = max(0, min(jat, EOSJMAX - 2))
     iat = int((math.log10(din) - eos_dlo) * eos_dstpi)
     iat = max(0, min(iat, EOSIMAX - 2))
+    return iat, jat
 
+
+def changefi(iat, jat):
     fi[0] = eos_f[iat, jat]
     fi[1] = eos_f[iat + 1, jat]
     fi[2] = eos_f[iat, jat + 1]
@@ -255,13 +257,16 @@ def interpolate_energy(den, btemp):
     fi[34] = eos_fddtt[iat, jat + 1]
     fi[35] = eos_fddtt[iat + 1, jat + 1]
 
-    # various differences
+
+def getdiff(iat, jat, din, btemp):
     xt = max((btemp - eos_t[jat]) * eos_dtInv[jat], 0.0e0)
     xd = max((din - eos_d[iat]) * eos_ddInv[iat], 0.0e0)
     mxt = 1.0e0 - xt
     mxd = 1.0e0 - xd
+    return xt, xd, mxt, mxd
 
-    # the density and temperature basis functions
+
+def gettbasic(xt, mxt, jat):
     si0t = psi0(xt)
     si1t = psi1(xt) * eos_dt[jat]
     si2t = psi2(xt) * eos_dtSqr[jat]
@@ -269,7 +274,10 @@ def interpolate_energy(den, btemp):
     si0mt = psi0(mxt)
     si1mt = -psi1(mxt) * eos_dt[jat]
     si2mt = psi2(mxt) * eos_dtSqr[jat]
+    return si0t, si1t, si2t, si0mt, si1mt, si2mt
 
+
+def getdbasic(xd, mxd, iat):
     si0d = psi0(xd)
     si1d = psi1(xd) * eos_dd[iat]
     si2d = psi2(xd) * eos_ddSqr[iat]
@@ -277,8 +285,10 @@ def interpolate_energy(den, btemp):
     si0md = psi0(mxd)
     si1md = -psi1(mxd) * eos_dd[iat]
     si2md = psi2(mxd) * eos_ddSqr[iat]
+    return si0d, si1d, si2d, si0md, si1md, si2md
 
-    # the first derivatives of the basis functions
+
+def getdtbasic(xt, mxt, jat):
     dsi0t = dpsi0(xt) * eos_dtInv[jat]
     dsi1t = dpsi1(xt)
     dsi2t = dpsi2(xt) * eos_dt[jat]
@@ -286,8 +296,21 @@ def interpolate_energy(den, btemp):
     dsi0mt = -dpsi0(mxt) * eos_dtInv[jat]
     dsi1mt = dpsi1(mxt)
     dsi2mt = -dpsi2(mxt) * eos_dt[jat]
+    return dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt
 
-    # the second derivatives of the basis functions
+
+def getddbasic(xd, mxd, iat):
+    dsi0d = dpsi0(xd) * eos_ddInv[iat]
+    dsi1d = dpsi1(xd)
+    dsi2d = dpsi2(xd) * eos_dd[iat]
+
+    dsi0md = -dpsi0(mxd) * eos_ddInv[iat]
+    dsi1md = dpsi1(mxd)
+    dsi2md = -dpsi2(mxd) * eos_dd[iat]
+    return dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md
+
+
+def getddtbasic(xt, mxt, jat):
     ddsi0t = ddpsi0(xt) * eos_dtSqrInv[jat]
     ddsi1t = ddpsi1(xt) * eos_dtInv[jat]
     ddsi2t = ddpsi2(xt)
@@ -295,6 +318,27 @@ def interpolate_energy(den, btemp):
     ddsi0mt = ddpsi0(mxt) * eos_dtSqrInv[jat]
     ddsi1mt = -ddpsi1(mxt) * eos_dtInv[jat]
     ddsi2mt = ddpsi2(mxt)
+    return ddsi0t, ddsi1t, ddsi2t, ddsi0mt, ddsi1mt, ddsi2mt
+
+
+def interpolate_energy(den, btemp):
+    din = ye * den
+    iat, jat = getij(din, btemp)
+
+    changefi(iat, jat)
+
+    xt, xd, mxt, mxd = getdiff(iat, jat, din, btemp)
+
+    # the density and temperature basis functions
+    si0t, si1t, si2t, si0mt, si1mt, si2mt = gettbasic(xt, mxt, jat)
+
+    si0d, si1d, si2d, si0md, si1md, si2md = getdbasic(xd, mxd, iat)
+
+    # the first derivatives of the basis functions
+    dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt = getdtbasic(xt, mxt, jat)
+
+    # the second derivatives of the basis functions
+    ddsi0t, ddsi1t, ddsi2t, ddsi0mt, ddsi1mt, ddsi2mt = getddtbasic(xt, mxt, jat)
 
     # the free energy
     free = h5(si0t, si1t, si2t, si0mt, si1mt, si2mt, si0d, si1d, si2d, si0md, si1md, si2md)
@@ -331,115 +375,19 @@ def interpolate_energy(den, btemp):
 
 def interpolate_press(den, btemp):
     din = ye * den
-    jat = int((math.log10(btemp) - eos_tlo) * eos_tstpi)
-    jat = max(0, min(jat, EOSJMAX - 2))
-    iat = int((math.log10(din) - eos_dlo) * eos_dstpi)
-    iat = max(0, min(iat, EOSIMAX - 2))
-    # print(jat)
-    # print(iat)
+    iat, jat = getij(din, btemp)
 
-    fi[0] = eos_f[iat, jat]
-    fi[1] = eos_f[iat + 1, jat]
-    fi[2] = eos_f[iat, jat + 1]
-    fi[3] = eos_f[iat + 1, jat + 1]
-    fi[4] = eos_ft[iat, jat]
-    fi[5] = eos_ft[iat + 1, jat]
-    fi[6] = eos_ft[iat, jat + 1]
-    fi[7] = eos_ft[iat + 1, jat + 1]
-    fi[8] = eos_ftt[iat, jat]
-    fi[9] = eos_ftt[iat + 1, jat]
-    fi[10] = eos_ftt[iat, jat + 1]
-    fi[11] = eos_ftt[iat + 1, jat + 1]
-    fi[12] = eos_fd[iat, jat]
-    fi[13] = eos_fd[iat + 1, jat]
-    fi[14] = eos_fd[iat, jat + 1]
-    fi[15] = eos_fd[iat + 1, jat + 1]
-    fi[16] = eos_fdd[iat, jat]
-    fi[17] = eos_fdd[iat + 1, jat]
-    fi[18] = eos_fdd[iat, jat + 1]
-    fi[19] = eos_fdd[iat + 1, jat + 1]
-    fi[20] = eos_fdt[iat, jat]
-    fi[21] = eos_fdt[iat + 1, jat]
-    fi[22] = eos_fdt[iat, jat + 1]
-    fi[23] = eos_fdt[iat + 1, jat + 1]
-    fi[24] = eos_fddt[iat, jat]
-    fi[25] = eos_fddt[iat + 1, jat]
-    fi[26] = eos_fddt[iat, jat + 1]
-    fi[27] = eos_fddt[iat + 1, jat + 1]
-    fi[28] = eos_fdtt[iat, jat]
-    fi[29] = eos_fdtt[iat + 1, jat]
-    fi[30] = eos_fdtt[iat, jat + 1]
-    fi[31] = eos_fdtt[iat + 1, jat + 1]
-    fi[32] = eos_fddtt[iat, jat]
-    fi[33] = eos_fddtt[iat + 1, jat]
-    fi[34] = eos_fddtt[iat, jat + 1]
-    fi[35] = eos_fddtt[iat + 1, jat + 1]
+    changefi(iat, jat)
 
-    # various differences
-    xt = max((btemp - eos_t[jat]) * eos_dtInv[jat], 0.0e0)
-    xd = max((din - eos_d[iat]) * eos_ddInv[iat], 0.0e0)
-    mxt = 1.0e0 - xt
-    mxd = 1.0e0 - xd
+    xt, xd, mxt, mxd = getdiff(iat, jat, din, btemp)
 
     # the density and temperature basis functions
-    si0t = psi0(xt)
-    si1t = psi1(xt) * eos_dt[jat]
-    si2t = psi2(xt) * eos_dtSqr[jat]
+    si0t, si1t, si2t, si0mt, si1mt, si2mt = gettbasic(xt, mxt, jat)
 
-    si0mt = psi0(mxt)
-    si1mt = -psi1(mxt) * eos_dt[jat]
-    si2mt = psi2(mxt) * eos_dtSqr[jat]
-
-    # si0d = psi0(xd)
-    # si1d = psi1(xd) * eos_dd[iat]
-    # si2d = psi2(xd) * eos_ddSqr[iat]
-    #
-    # si0md = psi0(mxd)
-    # si1md = -psi1(mxd) * eos_dd[iat]
-    # si2md = psi2(mxd) * eos_ddSqr[iat]
-
-    # the first derivatives of the basis functions
-    # dsi0t = dpsi0(xt) * eos_dtInv[jat]
-    # dsi1t = dpsi1(xt)
-    # dsi2t = dpsi2(xt) * eos_dt[jat]
-    #
-    # dsi0mt = -dpsi0(mxt) * eos_dtInv[jat]
-    # dsi1mt = dpsi1(mxt)
-    # dsi2mt = -dpsi2(mxt) * eos_dt[jat]
-
-    dsi0d = dpsi0(xd) * eos_ddInv[iat]
-    dsi1d = dpsi1(xd)
-    dsi2d = dpsi2(xd) * eos_dd[iat]
-
-    dsi0md = -dpsi0(mxd) * eos_ddInv[iat]
-    dsi1md = dpsi1(mxd)
-    dsi2md = -dpsi2(mxd) * eos_dd[iat]
-
-    # # the second derivatives of the basis functions
-    # ddsi0t = ddpsi0(xt) * eos_dtSqrInv[jat]
-    # ddsi1t = ddpsi1(xt) * eos_dtInv[jat]
-    # ddsi2t = ddpsi2(xt)
-    #
-    # ddsi0mt = ddpsi0(mxt) * eos_dtSqrInv[jat]
-    # ddsi1mt = -ddpsi1(mxt) * eos_dtInv[jat]
-    # ddsi2mt = ddpsi2(mxt)
-
-    # the free energy
-    # free = h5(si0t, si1t, si2t, si0mt, si1mt, si2mt, si0d, si1d, si2d, si0md, si1md, si2md)
+    dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md = getddbasic(xd, mxd, iat)
 
     # derivative with respect to density
     df_d = h5(si0t, si1t, si2t, si0mt, si1mt, si2mt, dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md)
-
-    # # derivative with respect to temperature
-    # df_t = h5(dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt, si0d, si1d, si2d, si0md, si1md, si2md)
-    #
-    # # second derivative with respect to temperature
-    # df_tt = h5(ddsi0t, ddsi1t, ddsi2t, ddsi0mt, ddsi1mt, ddsi2mt, si0d, si1d, si2d, si0md, si1md, si2md)
-    #
-    # # second derivative with respect to temperature and density
-    # df_dt = h5(dsi0t, dsi1t, dsi2t, dsi0mt, dsi1mt, dsi2mt, dsi0d, dsi1d, dsi2d, dsi0md, dsi1md, dsi2md)
-
-    # df_dd = h5(si0t, si1t, si2t, si0mt, si1mt, si2mt, ddsi0d, ddsi1d, ddsi2d, ddsi0md, ddsi1md, ddsi2md)
 
     # the desired electron - positron thermodynamic quantities
     x3 = din * din
