@@ -7,7 +7,7 @@ v1 = np.ravel(x1)  # 2d->1d
 v2 = np.ravel(x2)  # 2d->1d
 Y = v1**2 + v2**2  # get x1**2+x2**2
 X = np.stack((v1, v2), axis=1)  # reshape to 40000*2
-nn = MLPRegressor(hidden_layer_sizes=(500, 200), activation='relu', solver='adam', alpha=0.0001,)
+nn = MLPRegressor(hidden_layer_sizes=(100, 50), activation='relu', solver='adam', alpha=0.0001,)
 nn.fit(X, Y)
 yptrain = nn.predict(X)
 
@@ -18,12 +18,11 @@ yptrain = nn.predict(X)
 
 # calculate R**2
 Et = np.mean(Y)
-print(Et)
 tminusp = yptrain - Y
-tminusp2 = [x*y for x, y in zip(tminusp, tminusp)]
-tminusEt2 = [(x-Et)**2 for x in Y]
-R2 = 1 - np.sum([x/y for x, y in zip(tminusp2, tminusEt2)])
-print(R2)
+tminusp2 = np.array(tminusp)**2
+tminusEt2 = (np.array(Y) - Et)**2
+R2 = 1 - np.sum(tminusp2)/np.sum(tminusEt2)
+print("R2=", R2)
 
 plt.figure()
 Xp1, Yp1 = np.mgrid[-1:1:200j, -1:1:200j]
