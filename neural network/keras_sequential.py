@@ -2,12 +2,13 @@ from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np
 
-model = Sequential()
-model.add(Dense(1, use_bias=False, input_shape=(2,)))
-model.add(Dense(1))
-model.add(Dense(1))
-model.add(Dense(1))
-model.compile(loss='mse', optimizer='adam')
+def getmodel():
+    model = Sequential()
+    model.add(Dense(1, use_bias=False, input_shape=(2,)))
+    model.add(Dense(1))
+    model.compile(loss='mse', optimizer='adam')
+    return model
+
 
 x1, x2 = np.mgrid[-10:4:141j, 16:26:101j]  # 141*101
 v1 = np.ravel(x1)  # lg(density) 2d->1d
@@ -21,8 +22,16 @@ Pm = data[:, 1]  # intensity of pressure
 T = np.log10(Tm)  # lg(tem)
 P = np.log10(Pm)  # lg(press)
 
-model.fit(X, T, epochs=40, batch_size=32)
-ttrain = model.predict(X)
+modelt = getmodel()
+modelt.fit(X, T, epochs=40, batch_size=32)
+ttrain = modelt.predict(X)
 print(T)
 print(ttrain)
 print(ttrain.shape)
+
+
+modelp = getmodel()
+modelp.fit(X, P, epochs=40, batch_size=32)
+ptrain = modelp.predict(X)
+print(P)
+print(ptrain)
