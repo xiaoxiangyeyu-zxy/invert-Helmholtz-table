@@ -4,7 +4,9 @@ import numpy as np
 
 model = Sequential()
 model.add(Dense(1, use_bias=False, input_shape=(2,)))
-# model.add(Dense(units=1, activation='softmax'))
+model.add(Dense(1))
+model.add(Dense(1))
+model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 
 x1, x2 = np.mgrid[-10:4:141j, 16:26:101j]  # 141*101
@@ -19,7 +21,7 @@ Pm = data[:, 1]  # intensity of pressure
 T = np.log10(Tm)  # lg(tem)
 P = np.log10(Pm)  # lg(press)
 
-model.fit(X, T, epochs=20, batch_size=32)
+model.fit(X, T, epochs=40, batch_size=32)
 ttrain = model.predict(X)
 print(T)
 print(ttrain)
