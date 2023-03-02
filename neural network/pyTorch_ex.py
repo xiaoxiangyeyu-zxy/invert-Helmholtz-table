@@ -13,9 +13,9 @@ class Net(nn.Module):
 
     def forward(self, in_put):
         out = self.hidden1(in_put)
-        out = torch.relu(out)
+        out = torch.relu(out)  # activation function = relu
         out = self.hidden2(out)
-        out = torch.sigmoid(out)
+        out = torch.sigmoid(out)  # activation function = sigmoid
         out = self.predict(out)
 
         return out
