@@ -7,8 +7,8 @@ from torch.autograd import Variable
 class Net(nn.Module):
     def __init__(self, n_input, n_hidden, n_output):
         super(Net, self).__init__()
-        self.hidden1 = nn.Linear(n_input, n_hidden)
-        self.hidden2 = nn.Linear(n_hidden, n_hidden)
+        self.hidden1 = nn.Linear(n_input, n_hidden)  # first interlayer
+        self.hidden2 = nn.Linear(n_hidden, n_hidden)  # second interlayer
         self.predict = nn.Linear(n_hidden, n_output)
 
     def forward(self, in_put):
@@ -22,9 +22,7 @@ class Net(nn.Module):
 
 
 net = Net(1, 20, 1)
-print(net)
-
-optimizer = torch.optim.Adam(net.parameters(), lr=0.1)
+optimizer = torch.optim.Adam(net.parameters(), lr=0.1)  # lr=learning rate
 loss_func = torch.nn.MSELoss()
 
 x = torch.unsqueeze(torch.linspace(-1, 1, 100), dim=1)
@@ -33,14 +31,11 @@ x, y = (Variable(x), Variable(y))
 
 
 for i in range(5000):
-    prediction = net(x)
-    loss = loss_func(prediction, y)
+    prediction = net(x)  # predict result
+    loss = loss_func(prediction, y)  # calculate loss rate
 
     optimizer.zero_grad()  # set grad to zero
-    loss.backward()
-    optimizer.step()
+    loss.backward()  # loss back propagation
+    optimizer.step()  # grad optimize
 
     print(float(loss), i+1)
-
-# print(y)
-# print(net(x))
