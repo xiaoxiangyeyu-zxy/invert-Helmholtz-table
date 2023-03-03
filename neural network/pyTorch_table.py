@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from torch.autograd import Variable
 import numpy as np
 
+interlayer_T1 = 200  # interlayer of network for T
+interlayer_P1 = 200  # interlayer of network for P
+iteration_T1 = 10000  # iteration times of network for T
+iteration_P1 = 10000  # iteration times of network for P
+
 
 class Net(nn.Module):
     def __init__(self, n_input, n_hidden, n_output):
@@ -42,12 +47,12 @@ X_torch = Variable(torch.from_numpy(X))
 T_torch = Variable(torch.from_numpy(T.reshape(-1, 1)))
 P_torch = Variable(torch.from_numpy(P.reshape(-1, 1)))
 
-net_T = Net(2, 200, 1)
+net_T = Net(2, interlayer_T1, 1)
 optimizer = torch.optim.Adam(net_T.parameters(), lr=0.01)  # lr=learning rate
 loss_func = torch.nn.MSELoss()  # loss function = mse
 
 loss_now = 10086
-for i in range(10000):
+for i in range(iteration_T1):
     prediction = net_T(X_torch)  # predict result
     loss = loss_func(prediction, T_torch)  # calculate loss rate
 
@@ -59,12 +64,12 @@ for i in range(10000):
         print(float(loss), i+1)
         loss_now = loss
 
-net_P = Net(2, 200, 1)
+net_P = Net(2, interlayer_P1, 1)
 optimizer = torch.optim.Adam(net_P.parameters(), lr=0.01)  # lr=learning rate
 loss_func = torch.nn.MSELoss()  # loss function = mse
 
 loss_now = 10086
-for i in range(10000):
+for i in range(iteration_P1):
     prediction = net_P(X_torch)  # predict result
     loss = loss_func(prediction, P_torch)  # calculate loss rate
 
@@ -156,5 +161,3 @@ with open("R2.txt", "w") as f:
     f.write("\n")
     f.write("R2Pm:")
     f.write(str(R2Pm))
-
-print(T_torch-net_T(X_torch))
