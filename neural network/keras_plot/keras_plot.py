@@ -68,7 +68,8 @@ print("R2Pm=", R2Pm)
 
 x_plot = 10**x1
 y_plot = 10**x2
-plot_fig.plot_fig(Pm, Tm, ptrainm, ttrainm, x_plot, y_plot, x_shape, y_shape)
+plot_fig.plot_fig(Pm, ptrainm, x_plot, y_plot, x_shape, y_shape, 'P')
+plot_fig.plot_fig(Tm, ttrainm, x_plot, y_plot, x_shape, y_shape, 'T')
 
 with open("R2.txt", "w") as f:
     f.write("R2T:")
