@@ -5,13 +5,15 @@ import sys
 
 lgdenmax = 4  # lg(den upper limit of net electron)
 EOSIUSE = int((lgdenmax + 10) * 10 + 1)  # den index
+dden = 0.2
+EOSDEN = int((lgdenmax + 10) / dden + 1)
 zbar = 1    # average number of protons per nuclei
 abar = 1    # average number of nucleons per nuclei
 ye = zbar/abar  # electron mole number
 
 lgEmin = 16.  # lg(energy upper limit)
 lgEmax = 26.  # lg(energy lower limit)
-dE = 0.1      # interval of lgE
+dE = 0.2      # interval of lgE
 indexE = int((lgEmax-lgEmin)/dE)+1
 
 fi = [0]*36
@@ -423,13 +425,15 @@ if max(emin) > 10**lgEmin:
     sys.exit()
 if min(emax) < 10**lgEmax:
     print('warning!lgEmax is too big.')
+    sys.exit()
 
-result = [[] for i in range(EOSIUSE*indexE)]
-for i in range(EOSIUSE):
+result = [[] for i in range(EOSDEN*indexE)]
+for i in range(EOSDEN):
     E_TT = []
-    denuse = 10**(-10.+0.1*i) / ye
+    denuse = 10**(-10.+dden*i) / ye
     for j in range(EOSJMAX):
-        ereal = get_energy(i, j)
+        T_tem = 10**(4 + 0.1*j)
+        ereal, dereal = interpolate_energy(denuse, T_tem)
         E_TT.append(ereal)
     for k in range(indexE):
         Ewant = 10**(lgEmin+k*dE)
@@ -451,4 +455,4 @@ for i in range(EOSIUSE):
         result[i*indexE+k].append(Pout)
     print(i, 'complete')
 
-np.savetxt('table.txt', result)
+np.savetxt('table_'+str(EOSDEN)+'_'+str(indexE)+'.txt', result)
