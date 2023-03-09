@@ -5,8 +5,8 @@ import cv2
 x_shape = 141
 y_shape = 101
 
-x_compression = 70
-y_compression = 50
+x_compression = 28
+y_compression = 20
 
 # 整张图 DCT 变换
 def whole_img_dct(img_f32, x, y):
@@ -39,5 +39,10 @@ Tm_dct = whole_img_dct(Tm[:x_shape-1, :y_shape-1], x_compression, y_compression)
 # print(Tm)
 # print(Tm_dct)
 
-print(np.around(Tm[:x_shape-1, :y_shape-1]-10**T_dct, 16))
-print(np.around(Tm[:x_shape-1, :y_shape-1]-Tm_dct, 16))
+Tm_cut = Tm[:x_shape-1, :y_shape-1]
+
+print(np.around(Tm_cut-10**T_dct, 16))
+print(np.around(Tm_cut-Tm_dct, 16))
+
+print(np.mean((abs(Tm_cut-10**T_dct))/Tm_cut))
+print(np.mean((abs(Tm_cut-Tm_dct))/Tm_cut))
