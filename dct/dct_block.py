@@ -7,12 +7,14 @@ y_shape = 101
 x_compression = 28
 y_compression = 20
 
-block_x_number = 4
-block_y_number = 4
+block_x_number = 2
+block_y_number = 2
 
-x_block = 35
-y_block = 25
+x_block = int((x_shape-1)/block_x_number)
+y_block = int((y_shape-1)/block_y_number)
 
+x_in = int(x_compression / block_x_number)
+y_in = int(y_compression / block_y_number)
 
 def block_img_dct(img_f32, x, y):
     img_dct = cv2.dct(img_f32)
@@ -40,18 +42,19 @@ T_dct = np.zeros((x_shape-1, y_shape-1))
 P_dct = np.zeros((x_shape-1, y_shape-1))
 for i in range(block_x_number):
     for j in range(block_y_number):
-        T_dct[i*x_block:(i+1)*x_block, j*y_block:(j+i)*y_block] = block_img_dct(
-            T[i*x_block:(i+1)*x_block, j*y_block:(j+i)*y_block], int(x_compression/block_x_number
-                                                                     ), int(y_compression/block_y_number))
-        P_dct[i*x_block:(i+1)*x_block, j*y_block:(j+i)*y_block] = block_img_dct(
-            P[i*x_block:(i+1)*x_block, j*y_block:(j+i)*y_block], int(x_compression/block_x_number
-                                                                     ), int(y_compression/block_y_number))
+        T_use = block_img_dct(T[i*x_block:(i+1)*x_block, j*y_block:(j+1)*y_block], x_in, y_in)
+        T_dct[i * x_block:(i + 1) * x_block, j * y_block:(j + 1) * y_block] = T_use
+        P_use = block_img_dct(P[i*x_block:(i+1)*x_block, j*y_block:(j+1)*y_block], x_in, y_in)
+        P_dct[i * x_block:(i + 1) * x_block, j * y_block:(j + 1) * y_block] = P_use
 
-# T_dct = whole_img_dct(T[:x_shape-1, :y_shape-1], x_compression, y_compression)
-# P_dct = whole_img_dct(P[:x_shape-1, :y_shape-1], x_compression, y_compression)
-#
-# Tm_dct = whole_img_dct(Tm[:x_shape-1, :y_shape-1], x_compression, y_compression)
-# Pm_dct = whole_img_dct(Pm[:x_shape-1, :y_shape-1], x_compression, y_compression)
+Tm_dct = np.zeros((x_shape-1, y_shape-1))
+Pm_dct = np.zeros((x_shape-1, y_shape-1))
+for i in range(block_x_number):
+    for j in range(block_y_number):
+        Tm_use = block_img_dct(Tm[i*x_block:(i+1)*x_block, j*y_block:(j+1)*y_block], x_in, y_in)
+        Tm_dct[i * x_block:(i + 1) * x_block, j * y_block:(j + 1) * y_block] = Tm_use
+        Pm_use = block_img_dct(Pm[i*x_block:(i+1)*x_block, j*y_block:(j+1)*y_block], x_in, y_in)
+        Pm_dct[i * x_block:(i + 1) * x_block, j * y_block:(j + 1) * y_block] = Pm_use
 
 Tm_cut = Tm[:x_shape-1, :y_shape-1]
 Pm_cut = Pm[:x_shape-1, :y_shape-1]
@@ -60,10 +63,10 @@ Pm_cut = Pm[:x_shape-1, :y_shape-1]
 # print(np.around(Tm_cut-Tm_dct, 16))
 
 print(np.mean((abs(Tm_cut-10**T_dct))/Tm_cut))
-# print(np.mean((abs(Tm_cut-Tm_dct))/Tm_cut))
+print(np.mean((abs(Tm_cut-Tm_dct))/Tm_cut))
 
 # print(np.around(Pm_cut-10**P_dct, 16))
 # print(np.around(Pm_cut-Pm_dct, 16))
 
 print(np.mean((abs(Pm_cut-10**P_dct))/Pm_cut))
-# print(np.mean((abs(Pm_cut-Pm_dct))/Pm_cut))
+print(np.mean((abs(Pm_cut-Pm_dct))/Pm_cut))
