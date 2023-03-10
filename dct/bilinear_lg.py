@@ -1,4 +1,5 @@
 import numpy as np
+import plot_fig
 
 lgEmin = 16.
 lgEmax = 26.
@@ -77,3 +78,9 @@ print(T_cut)
 print(np.mean(abs(Pm_cut-10**P_result)/Pm_cut))
 print(P_result)
 print(P_cut)
+
+x1, x2 = np.mgrid[-10:3.9:140j, 16:25.9:100j]
+x1 = 10**x1
+x2 = 10**x2
+plot_fig.plot_fig(Tm_cut, 10**T_result, x1, x2, x_shape1-1, y_shape1-1, "T")
+plot_fig.plot_fig(Pm_cut, 10**P_result, x1, x2, x_shape1-1, y_shape1-1, "P")

@@ -1,14 +1,15 @@
 import numpy as np
 import cv2
+import plot_fig
 
 x_shape = 141
 y_shape = 101
 
-x_compression = 28
+x_compression = 30
 y_compression = 20
 
-block_x_number = 2
-block_y_number = 2
+block_x_number = 10
+block_y_number = 10
 
 x_block = int((x_shape-1)/block_x_number)
 y_block = int((y_shape-1)/block_y_number)
@@ -70,3 +71,9 @@ print(np.mean((abs(Tm_cut-Tm_dct))/Tm_cut))
 
 print(np.mean((abs(Pm_cut-10**P_dct))/Pm_cut))
 print(np.mean((abs(Pm_cut-Pm_dct))/Pm_cut))
+
+x1, x2 = np.mgrid[-10:3.9:140j, 16:25.9:100j]
+x1 = 10**x1
+x2 = 10**x2
+plot_fig.plot_fig(Tm_cut, 10**T_dct, x1, x2, x_shape-1, y_shape-1, "T")
+plot_fig.plot_fig(Pm_cut, 10**P_dct, x1, x2, x_shape-1, y_shape-1, "P")
