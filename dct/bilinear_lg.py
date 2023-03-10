@@ -39,12 +39,12 @@ P2 = P2.reshape(x_shape2, y_shape2)
 def interpolate(ii, jj, de, dden):
     minusde = dE2 - de
     minusdden = dden2 - dden
-    t_inter = abs(de * dden) / (dE2 * dden2) * T2[ii, jj] + abs(minusde * dden) / (dE2 * dden2) * T2[ii, jj + 1] + \
-        abs(de * minusdden) / (dE2 * dden2) * T2[ii + 1, jj] + abs(minusde * minusdden) / (dE2 * dden2) * T2[
-                  ii + 1, jj + 1]
-    p_inter = abs(de * dden) / (dE2 * dden2) * P2[ii, jj] + abs(minusde * dden) / (dE2 * dden2) * P2[ii, jj + 1] + \
-        abs(de * minusdden) / (dE2 * dden2) * P2[ii + 1, jj] + abs(minusde * minusdden) / (dE2 * dden2) * P2[
-                  ii + 1, jj + 1]
+    t_inter = abs(de * dden) / (dE2 * dden2) * T2[ii+1, jj+1] + abs(minusde * dden) / (dE2 * dden2) * T2[ii+1, jj] + \
+        abs(de * minusdden) / (dE2 * dden2) * T2[ii, jj+1] + abs(minusde * minusdden) / (dE2 * dden2) * T2[
+                  ii, jj]
+    p_inter = abs(de * dden) / (dE2 * dden2) * P2[ii+1, jj+1] + abs(minusde * dden) / (dE2 * dden2) * P2[ii+1, jj] + \
+        abs(de * minusdden) / (dE2 * dden2) * P2[ii, jj+1] + abs(minusde * minusdden) / (dE2 * dden2) * P2[
+                  ii, jj]
     return t_inter, p_inter
 
 

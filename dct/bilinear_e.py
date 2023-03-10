@@ -41,12 +41,12 @@ def interpolate(ii, jj, de, dden):
     d10E = 10**((jj+1)*dE2+lgEmin) - 10**(jj*dE2+lgEmin)
     minusde = d10E - de
     minusdden = d10den - dden
-    t_inter = abs(de * dden) / (d10E * d10den) * Tm2[ii, jj] + abs(minusde * dden) / (d10E * d10den) * Tm2[ii, jj + 1] + \
-        abs(de * minusdden) / (d10E * d10den) * Tm2[ii + 1, jj] + abs(minusde * minusdden) / (d10E * d10den) * Tm2[
-                  ii + 1, jj + 1]
-    p_inter = abs(de * dden) / (d10E * d10den) * Pm2[ii, jj] + abs(minusde * dden) / (d10E * d10den) * Pm2[ii, jj + 1] + \
-        abs(de * minusdden) / (d10E * d10den) * Pm2[ii + 1, jj] + abs(minusde * minusdden) / (d10E * d10den) * Pm2[
-                  ii + 1, jj + 1]
+    t_inter = abs(de * dden) / (d10E * d10den) * Tm2[ii+1, jj+1] + abs(minusde * dden) / (d10E * d10den) * Tm2[ii+1, jj] + \
+        abs(de * minusdden) / (d10E * d10den) * Tm2[ii, jj+1] + abs(minusde * minusdden) / (d10E * d10den) * Tm2[
+                  ii, jj]
+    p_inter = abs(de * dden) / (d10E * d10den) * Pm2[ii+1, jj+1] + abs(minusde * dden) / (d10E * d10den) * Pm2[ii+1, jj] + \
+        abs(de * minusdden) / (d10E * d10den) * Pm2[ii, jj+1] + abs(minusde * minusdden) / (d10E * d10den) * Pm2[
+                  ii, jj]
     return t_inter, p_inter
 
 
