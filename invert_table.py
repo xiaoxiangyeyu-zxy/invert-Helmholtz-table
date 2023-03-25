@@ -4,9 +4,10 @@ import math
 import sys
 
 lgdenmax = 4  # lg(den upper limit of net electron)
-EOSIUSE = int((lgdenmax + 10) * 10 + 1)  # den index
+lgdenmin = -10
+EOSIUSE = int((lgdenmax - lgdenmin) * 10 + 1)  # den index
 dden = 0.2
-EOSDEN = int((lgdenmax + 10) / dden + 1)
+EOSDEN = int((lgdenmax - lgdenmin) / dden + 1)
 zbar = 1    # average number of protons per nuclei
 abar = 1    # average number of nucleons per nuclei
 ye = zbar/abar  # electron mole number
@@ -430,7 +431,7 @@ if min(emax) < 10**lgEmax:
 result = [[] for i in range(EOSDEN*indexE)]
 for i in range(EOSDEN):
     E_TT = []
-    denuse = 10**(-10.+dden*i) / ye
+    denuse = 10**(lgdenmin+dden*i) / ye
     for j in range(EOSJMAX):
         T_tem = 10**(4 + 0.1*j)
         ereal, dereal = interpolate_energy(denuse, T_tem)
@@ -455,4 +456,12 @@ for i in range(EOSDEN):
         result[i*indexE+k].append(Pout)
     print(i, 'complete')
 
-np.savetxt('table_'+str(EOSDEN)+'_'+str(indexE)+'.txt', result)
+with open('Helmholtz_'+str(EOSDEN)+'_'+str(indexE)+'_den_energy.txt', "w") as f:
+    f.write(str(EOSDEN)+'\n')
+    f.write(str(indexE)+'\n')
+    f.write(str(lgdenmin) + '\n')
+    f.write(str(lgdenmax) + '\n')
+    f.write(str(lgEmin) + '\n')
+    f.write(str(lgEmax) + '\n')
+    np.savetxt(f, result)
+f.close()
