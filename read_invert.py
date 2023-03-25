@@ -1,23 +1,28 @@
 import numpy as np
 
-# read the data from the file "table.txt"
-data = np.loadtxt("table.txt")
+# read the data from the file "Helmholtz_29_21_den_energy.txt"
+with open("Helmholtz_29_21_den_energy.txt", "r") as f:
+    den_index = f.readline()
+    energy_index = f.readline()
+    lgdenmin = f.readline()
+    lgdenmax = f.readline()
+    lgenergymin = f.readline()
+    lgenergymax = f.readline()
+    data = np.loadtxt(f)
+f.close()
 # print(data)
+
+den_index = int(den_index)
+energy_index = int(energy_index)
+lgdenmin = float(lgdenmin)
+lgdenmax = float(lgdenmax)
+lgenergymin = float(lgenergymin)
+lgenergymax = float(lgenergymax)
 
 # the first column of data is temperature, the second column of data is intensity of pressure
 T = data[:, 0]
 P = data[:, 1]
 
-lgdenmax = 4  # lg(density upper limit of net electron)
-indexden = int((lgdenmax + 10) * 10 + 1)  # density total index
-
-lgEmin = 16.  # lg(energy upper limit)
-lgEmax = 26.  # lg(energy lower limit)
-dE = 0.1      # interval of lgE
-indexE = int((lgEmax-lgEmin)/dE)+1  # energy total index
-
 # the first index is density, the second index is energy
-# density: lgden from -10 to 4, interval = 0.1, total points are 141
-# energy: lgE from 16 to 26, interval = 0.1, total points are 101
-Tuse = T.reshape(indexden, indexE)
-Puse = P.reshape(indexden, indexE)
+Tuse = T.reshape(den_index, energy_index)
+Puse = P.reshape(den_index, energy_index)
