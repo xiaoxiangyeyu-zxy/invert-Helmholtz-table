@@ -459,8 +459,8 @@ for i in range(EOSDEN):
 with open('Helmholtz_'+str(EOSDEN)+'_'+str(indexE)+'_den_energy.txt', "w") as f:
     f.write(str(EOSDEN)+'\n')
     f.write(str(indexE)+'\n')
-    f.write(str(lgdenmin) + '\n')
-    f.write(str(lgdenmax) + '\n')
+    f.write(str(lgdenmin-math.log10(ye)) + '\n')
+    f.write(str(lgdenmax-math.log10(ye)) + '\n')
     f.write(str(lgEmin) + '\n')
     f.write(str(lgEmax) + '\n')
     np.savetxt(f, result)
