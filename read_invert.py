@@ -11,10 +11,10 @@ f.close()
 
 den_index = int(l1[1])
 dDen = float(l1[2])
-lgdenmin = float(l1[3])
+lgdenmin = math.log10(float(l1[3]))
 energy_index = int(l2[1])
 dE = float(l2[2])
-lgenergymin = float(l2[3])
+lgenergymin = math.log10(float(l2[3]))
 
 # print(data)
 

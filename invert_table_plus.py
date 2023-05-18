@@ -443,8 +443,8 @@ for i in range(EOSDEN):
     for k in range(indexE):
         Ewant = 10**(lgEmin+k*dE)
         if Ewant > emax[i] or Ewant < emin[i]:
-            Tuse = -1
-            Pout = -1
+            Tuse = 0.1
+            Pout = 0.1
         else:
             E_judge = abs(np.array(E_TT)-Ewant)
             T_index, diff_E = min(enumerate(E_judge))
