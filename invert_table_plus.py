@@ -14,8 +14,8 @@ EOSIUSE = int((lgdenmax - lgdenmin) * 10 + 1)  # den index
 dden = 0.2
 EOSDEN = int((lgdenmax - lgdenmin) / dden + 1)
 
-lgEmin = 12.2  # lg(energy upper limit)
-lgEmax = 40.4  # lg(energy lower limit)
+lgEmin = 12.4  # lg(energy upper limit)
+lgEmax = 40.2  # lg(energy lower limit)
 dE = 0.2      # interval of lgE
 indexE = int((lgEmax-lgEmin)/dE)+1
 
@@ -465,11 +465,13 @@ for i in range(EOSDEN):
     print(i, 'complete')
 
 with open('Helmholtz_'+str(EOSDEN)+'_'+str(indexE)+'_den_energy_'+name+'.txt', "w") as f:
-    f.write(str(EOSDEN)+'\n')
-    f.write(str(indexE)+'\n')
-    f.write(str(lgdenmin-math.log10(ye)) + '\n')
-    f.write(str(lgdenmax-math.log10(ye)) + '\n')
-    f.write(str(lgEmin) + '\n')
-    f.write(str(lgEmax) + '\n')
+    f.write('#'+' ')
+    f.write(str(EOSDEN)+' ')
+    f.write(str(dden)+' ')
+    f.write(str(10**(lgdenmin - math.log10(ye))) + '\n')
+    f.write('#'+' ')
+    f.write(str(indexE)+' ')
+    f.write(str(dE)+' ')
+    f.write(str(10**(lgEmin)) + '\n')
     np.savetxt(f, result)
 f.close()
