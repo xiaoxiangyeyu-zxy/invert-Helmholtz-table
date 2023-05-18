@@ -1,20 +1,21 @@
 import numpy as np
-
+import math
 
 def den_ene_to_p(den, ene):
-    with open("Helmholtz_29_21_den_energy.txt", "r") as yu:
-        den_index = int(yu.readline())
-        energy_index = int(yu.readline())
-        lgdenmin = float(yu.readline())
-        lgdenmax = float(yu.readline())
-        lgenergymin = float(yu.readline())
-        lgenergymax = float(yu.readline())
+    with open("visual.txt", "r") as yu:
+        line1 = yu.readline()
+        l1 = line1.split()
+        line2 = yu.readline()
+        l2 = line2.split()
         data = np.loadtxt(yu)
     yu.close()
-    # print(data)
 
-    dE = (lgenergymax - lgenergymin)/(energy_index-1)
-    dDen = (lgdenmax - lgdenmin)/(den_index - 1)
+    den_index = int(l1[1])
+    dDen = float(l1[2])
+    lgdenmin = math.log10(float(l1[3]))
+    energy_index = int(l2[1])
+    dE = float(l2[2])
+    lgenergymin = math.log10(float(l2[3]))
 
     Tm = data[:, 0]  # temperature
     Pm = data[:, 1]  # intensity of pressure
@@ -24,7 +25,7 @@ def den_ene_to_p(den, ene):
     lgP = lgP.reshape(den_index, energy_index)
 
 
-    def interpolate(ii, jj, de, dden):
+    def interpolate_yu(ii, jj, de, dden):
         minusde = dE - de
         minusdden = dDen - dden
         t_inter = abs(de * dden) / (dE * dDen) * lgT[ii+1, jj+1] + abs(minusde * dden) / (dE * dDen) * lgT[ii+1, jj] + \
@@ -47,16 +48,16 @@ def den_ene_to_p(den, ene):
             for k in range(dimension_3):
                 lgden = np.log10(den[i][j][k])
                 indexden = int((lgden - lgdenmin) / dDen)
-                delta_den = (lgden - lgdenmin) % dDen
+                delta_den = lgden - lgdenmin - dDen*indexden
 
                 lgE = np.log10(ene[i][j][k])
                 indexE = int((lgE - lgenergymin) / dE)
-                delta_E = (lgE - lgenergymin) % dE
-                print(lgden,delta_den)
-                T_use, P_use = interpolate(indexden, indexE, delta_E, delta_den)
+                delta_E = lgE - lgenergymin - dE*indexE
+                # print(lgden,delta_den)
+                T_use, P_use = interpolate_yu(indexden, indexE, delta_E, delta_den)
                 T_out[i][j].append(10**T_use)
                 P_out[i][j].append(10**P_use)
-    return np.array(T_out), np.array(P_out)
+    return np.array(P_out)
 
 
 # test_den = [[[pow(10, 2.3)], [pow(10, 2.4)]], [[pow(10, 2.3)], [pow(10, 2.3)]]]
