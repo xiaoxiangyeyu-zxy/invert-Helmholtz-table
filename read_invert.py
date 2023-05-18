@@ -1,23 +1,22 @@
 import numpy as np
 
 # read the data from the file "Helmholtz_29_21_den_energy.txt"
-with open("Helmholtz_29_21_den_energy.txt", "r") as f:
-    den_index = f.readline()
-    energy_index = f.readline()
-    lgdenmin = f.readline()
-    lgdenmax = f.readline()
-    lgenergymin = f.readline()
-    lgenergymax = f.readline()
+with open("visual.txt", "r") as f:
+    line1 = f.readline()
+    l1 = line1.split()
+    line2 = f.readline()
+    l2 = line2.split()
     data = np.loadtxt(f)
 f.close()
-# print(data)
 
-den_index = int(den_index)
-energy_index = int(energy_index)
-lgdenmin = float(lgdenmin)
-lgdenmax = float(lgdenmax)
-lgenergymin = float(lgenergymin)
-lgenergymax = float(lgenergymax)
+den_index = int(l1[1])
+dDen = float(l1[2])
+lgdenmin = float(l1[3])
+energy_index = int(l2[1])
+dE = float(l2[2])
+lgenergymin = float(l2[3])
+
+# print(data)
 
 # the first column of data is temperature, the second column of data is intensity of pressure
 T = data[:, 0]
